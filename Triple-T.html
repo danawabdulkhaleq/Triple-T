@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triple T!</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <h1>Tic-Tac-Toe 💌 </h1>
+    <h2>if you're here then Dana probably forced you to tic-tac-toe...</h2>
+    <div id="game-board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+    <p id="status"></p>
+    <button id="play-again" style="display:ruby-base;">Play Again</button>
+    <img src="c:\Users\Dana\Downloads\124.png" id="butterfly" alt="butterfly">
+    <img src="c:\Users\Dana\Downloads\Untitled.png" id="doodles" alt="doodles">
+    <script src="script.js"> </script>
+</body>
+</html>
+<style> 
+    body {
+    font-family:  'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    text-align: center;
+    display: flex;
+    flex-direction:column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #faebd7; 
+}
+
+h1 {
+    color: #ffaaaa;
+    margin-right: 500px;
+    flex-direction: row;
+    display: flex;
+    font-family: cursive;
+
+}
+
+#doodles {
+    position: absolute;
+    width: 180px;
+    height: 100px;
+    top: 90px;
+    left: 50px;
+    
+}
+
+#butterfly {
+    position: absolute;
+    width: 280px;
+    height: 300px;
+    right: 60px;
+    bottom: 100px;
+}
+
+
+h2 {
+    color: #f4aeae;
+    font-family: cursive;
+    font-size: medium;
+}
+
+/* styles.css */
+
+#play-again {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor:progress;
+    background-color: #ff9e9e; /* Green color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+
+#game-board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 5px;
+    margin: 90px 0;
+}
+
+.cell {
+    width: 100px;
+    height: 100px;
+    background-color: #c59c9c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    cursor:pointer;
+    border: 1px solid #c87474;
+    border-radius: 20%;
+}
+
+.cell:hover {
+    background-color: #a7686859;
+}
+
+
+
+#status {
+    font-size: 1em;
+    margin-top: 15px;
+    color: #ff8b8b;
+}
+
+/* X and O colors in styles.css */
+.x-color {
+    color: rgb(255, 230, 230); /* Color for X */
+}
+
+.o-color {
+    color: rgb(255, 230, 230); /* Color for O */
+}
+
+</style>
+
+<script>
+// script.js
+
+const board = ["", "", "", "", "", "", "", "", ""];
+let currentPlayer = "X";
+let gameActive = true;
+
+const cells = document.querySelectorAll(".cell");
+const statusText = document.getElementById("status");
+const playAgainButton = document.getElementById("play-again");
+
+const winConditions = [
+    [0, 1, 2], [3, 4, 5], [6, 7, 8],  
+    [0, 3, 6], [1, 4, 7], [2, 5, 8],  
+    [0, 4, 8], [2, 4, 6]              
+];
+
+cells.forEach(cell => cell.addEventListener("click", handlePlayerMove));
+playAgainButton.addEventListener("click", resetGame);
+
+function handlePlayerMove(event) {
+    const cellIndex = event.target.getAttribute("data-index");
+
+    if (board[cellIndex] === "" && gameActive) {
+        board[cellIndex] = currentPlayer;
+        event.target.innerText = currentPlayer;
+
+        if (currentPlayer === "X") {
+            event.target.classList.add("x-color");
+        } else {
+            event.target.classList.add("o-color");
+        }
+
+        checkResult();
+
+        if (gameActive) {
+            currentPlayer = "O";
+            setTimeout(computerMove, 500);
+        }
+    }
+}
+
+function computerMove() {
+    let availableCells = board.map((cell, index) => cell === "" ? index : null).filter(index => index !== null);
+    let randomIndex = availableCells[Math.floor(Math.random() * availableCells.length)];
+
+    if (randomIndex !== undefined) {
+        board[randomIndex] = "O";
+        cells[randomIndex].innerText = "O";
+        cells[randomIndex].classList.add("o-color"); 
+        checkResult();
+        currentPlayer = "X";
+    }
+}
+
+function checkResult() {
+    let roundWon = false;
+
+    for (let condition of winConditions) {
+        const [a, b, c] = condition;
+
+        if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+            roundWon = true;
+            break;
+        }
+    }
+
+    if (roundWon) {
+        gameActive = false;
+        statusText.innerText = currentPlayer === "X" ? "yay- wait... you won? really? out-smarting my AI? I'll haunt you in your sleep." : "ofc O wins! It's a machine. boo - if you thought you'd win.";
+        playAgainButton.style.display = "block";
+    } else if (!board.includes("")) {
+        gameActive = false;
+        statusText.innerText = "It's a draw! damn it!";
+        playAgainButton.style.display = "block";
+    }
+}
+
+function resetGame() {
+    console.log("Play Again button clicked");
+    board.fill("");
+    gameActive = true;
+    currentPlayer = "X";
+    statusText.innerText = "";
+    playAgainButton.style.display = "none";
+
+    cells.forEach(cell => {
+        cell.innerText = "";
+        cell.classList.remove("x-color", "o-color");
+    });
+}
+
+
+    </script> 
+    
